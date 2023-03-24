@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const verifyToken = require('./auth/Authentication');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -18,7 +19,8 @@ app.use((req, res, next) => {
     req.header('Access-Control-Allow-Headers', '*');
     next();
 });
-// [PENDING] Add authentication middleware
+// authentication
+app.use((req, res, next) => verifyToken(req, res, next));
 
 // configure routers
 // The idea is the same as in Java @RestControllers where the methods inherit the root path
