@@ -7,34 +7,39 @@ const router = express.Router();
 
 const userDB = require('../models/UserModel');
 
+function signToken(user) {
+    return jwt.sign(
+        {user_id: user._id, role: user.role, username: user.username},
+        process.env.TOKEN_KEY,
+        {
+            expiresIn: '5h'
+        }
+    );
+}
+
 router.route('/')
     .post(async (req, res) => {
         try {
+            if(req.user.role.toLowerCase() !== 'admin') {
+                return res.status(403).send('The user has no rights to create new users');
+            }
             const { username, role, password } = req.body;
             if(!(username && role && password)) {
-                res.status(400).send('Username, role and password are required');
-            } else {
-                const oldUser = await userDB.findOne({username}).exec();
-                if(oldUser) {
-                    res.status(409).send('User already exists');
-                } else {
-                    let encryptedPwd = await bcrypt.hash(password, 10);
-                    const user = await userDB.create({
-                        username,
-                        role,
-                        password: encryptedPwd
-                    });
-                    const token = jwt.sign(
-                        {user_id: user._id, username},
-                        process.env.TOKEN_KEY,
-                        {
-                            expiresIn: '5h'
-                        }
-                    );
-                    user.token = token;
-                    res.status(201).json(user);
-                }
+                return res.status(400).send('Username, role and password are required');
             }
+            const oldUser = await userDB.findOne({username}).exec();
+            if(oldUser) {
+                return res.status(409).send('User already exists');
+            }
+            let encryptedPwd = await bcrypt.hash(password, 10);
+            const user = await userDB.create({
+                username,
+                role,
+                password: encryptedPwd
+            });
+            const token = signToken(user);
+            user.token = token;
+            res.status(201).json(user);
         } catch(err) {
             res.status(500).send('Server error while registering user');
         }
@@ -61,13 +66,7 @@ router.post('/login', async (req, res) => {
         } else {
             const user = await userDB.findOne({username}).exec();
             if(user && (await bcrypt.compare(password, user.password))) {
-                const token = jwt.sign(
-                    {user_id: user._id, username},
-                    process.env.TOKEN_KEY,
-                    {
-                        expiresIn: '5h'
-                    }
-                );
+                const token = signToken(user);
                 user.token = token;
                 res.status(200).json(user);
             } else {

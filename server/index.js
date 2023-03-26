@@ -20,7 +20,12 @@ app.use((req, res, next) => {
     next();
 });
 // authentication
-app.use((req, res, next) => verifyToken(req, res, next));
+app.use((req, res, next) => {
+    if(req.path === '/api/users/login') {
+        return next();
+    }
+    return verifyToken(req, res, next);
+});
 
 // configure routers
 // The idea is the same as in Java @RestControllers where the methods inherit the root path
