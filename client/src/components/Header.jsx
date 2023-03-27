@@ -1,8 +1,22 @@
 import React from 'react';
-
-import { AssignmentTurnedInOutlined, Close, NotificationsOutlined, FeaturedPlayListOutlined, PeopleAltOutlined, Search, ExpandMore, Home, AccountCircle } from '@mui/icons-material'
+import { AssignmentTurnedInOutlined, NotificationsOutlined, FeaturedPlayListOutlined, PeopleAltOutlined, Search, Home, AccountCircle } from '@mui/icons-material'
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, selectUser } from '../features/userSlice';
 
 const Header = () => {
+    const dispatch = useDispatch();
+    const handleLogout = () => {
+        if (window.confirm('Are you sure you want to logout?')) {
+            signOut(auth).then(() => {
+                dispatch(logout());
+                alert('Logged out');
+            }).catch(err => {
+                alert('Error logging out');
+            });
+        }
+    };
     return (
         <div className='flex items-center bg-white sticky z-50 shadow-sm top-0 justify-center p-[3px]'>
             <div className='flex'>
@@ -30,7 +44,7 @@ const Header = () => {
                 <input type="text" className='bg-transparent outline-none border-none' placeholder='Search...' />
             </div>
             <div>
-                <span>
+                <span onClick={handleLogout}>
                     <AccountCircle />
                 </span>
                 <button className='px-2 py-1 rounded-lg ml-1 bg-orange-300 hover:bg-orange-500'>Add Question</button>
