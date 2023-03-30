@@ -16,10 +16,9 @@ const Feed = () => {
     return (
         <div className='flex flex-col flex-1 p-2 md:flex-[0.6]'>
             {posts.map((post, index) => (
-                <Post
-                    key={index}
-                    post={post}
-                />
+                <>
+                    <Post post={post} />
+                </>
             ))}
         </div>
     );

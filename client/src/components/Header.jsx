@@ -10,8 +10,6 @@ import {
     ExpandMore
 } from '@mui/icons-material';
 import { Input, Avatar } from '@mui/joy';
-import { signOut } from 'firebase/auth';
-import { auth } from '../firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../features/userSlice';
 import axios from 'axios';
@@ -24,14 +22,8 @@ const Header = () => {
     const dispatch = useDispatch();
     const handleLogout = () => {
         if (window.confirm('Are you sure you want to logout?')) {
-            signOut(auth)
-                .then(() => {
-                    dispatch(logout());
-                    alert('Logged out');
-                })
-                .catch((err) => {
-                    alert('Error logging out');
-                });
+            dispatch(logout());
+            axios.defaults.headers.common['x-access-token'] = undefined;
         }
     };
     const [isModalOpen, setIsModalOpen] = useState(false);
