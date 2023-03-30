@@ -11,8 +11,8 @@ const db = require('./db');
 const router = require('./routes');
 
 // Middleware
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb'}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 // cors
 app.use((req, res, next) => {
     req.header('Access-Control-Allow-Origin', '*');
@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 });
 // authentication
 app.use((req, res, next) => {
-    if(req.path === '/api/users/login') {
+    if (req.path === '/api/users/login') {
         return next();
     }
     return verifyToken(req, res, next);
